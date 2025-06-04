@@ -1,0 +1,68 @@
+<div class="card">
+  <p-toolbar>
+    <ng-template #start>
+      <p-button
+        icon="pi pi-plus"
+        class="mr-2"
+        text
+        (click)="create()"
+        severity="secondary"
+        label="Создать"
+      />
+      <p-button
+        icon="pi pi-pencil"
+        class="mr-2"
+        text
+        [disabled]="!selectedElems"
+        (click)="edit()"
+        severity="secondary"
+        label="Редактировать"
+      />
+      <p-button
+        icon="pi pi-trash"
+        [disabled]="!selectedElems"
+        text
+        severity="secondary"
+        (click)="confirm()"
+        label="Удалить"
+      />
+    </ng-template>
+  </p-toolbar>
+  <p-table
+    [value]="data()"
+    [tableStyle]="{ 'min-width': '50rem' }"
+    selectionMode="single"
+    [(selection)]="selectedElems"
+    dataKey="id"
+  >
+    <ng-template #header>
+      <tr>
+        @for( col of cols();track col){
+        <th>{{col.name}}</th>
+        }
+      </tr>
+    </ng-template>
+    <ng-template #body let-elem>
+      <tr [pSelectableRow]="elem">
+        @for( col of cols();track col){
+        <td>{{elem[col.type]}}</td>
+        }
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+<p-dialog
+  [header]="mode === 'create' ? 'Создание' : 'Редактирование'"
+  [modal]="true"
+  [(visible)]="visible"
+  [style]="{ width: '25rem' }"
+>
+  <app-sport-event
+    [mode]="mode"
+    [visible]="visible"
+    [cols]="cols"
+    [data]="data"
+  ></app-sport-event>
+
+  <p-confirmdialog #cd />
+</p-dialog>
