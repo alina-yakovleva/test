@@ -1,10 +1,6 @@
 import {
   Component,
-  ContentChild,
-  EventEmitter,
-  Input,
-  OnInit,
-  Output,
+  input,
   model,
 } from '@angular/core';
 import {
@@ -16,7 +12,8 @@ import {
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
-import { Data } from './table-basic-demo';
+import { Data, Mode } from '../../models/data.interface';
+
 
 @Component({
   selector: 'app-base-event',
@@ -29,63 +26,62 @@ import { Data } from './table-basic-demo';
     InputTextModule,
     ButtonModule,
   ],
-  providers: [],
+
 })
-export class BaseEventFormComponent implements OnInit {
-  @Input()
-  public mode: string;
+export class BaseEventFormComponent  {
+ 
+  public mode= input.required<Mode>();
 
-  public visible = model<boolean>(false);
+  public visible = model.required<boolean>();
 
-  public data = model<Data[]>();
+  public data = model.required<Data[]>();
 
-  @Input()
-  public selectedElems: any;
+  public selectedElem=model.required<Data>();
 
-  public group1: FormGroup;
+  public formGroup: FormGroup;
+
   constructor(public fb: FormBuilder) {
     this.initForm();
   }
 
-  public initForm() {
-    this.group1 = this.fb.group({
+  public initForm():void {
+    this.formGroup = this.fb.group({
       name: new FormControl(''),
       description: new FormControl(''),
       place: new FormControl(''),
     });
   }
 
-  @Output()
-  public group = new EventEmitter<FormGroup>();
-
-  ngOnInit() {}
-
-  public submit() {
-    console.log(this.group1);
-    if (this.mode === 'create') {
+  
+  public submit():void {
+    
+    if (this.mode() === 'create') {
       this.data.update((v) => {
         v.push({
           id: Math.random(),
-          title: this.group1.get('name').value,
-          description: this.group1.get('description').value,
-          location: this.group1.get('place').value,
+          title: this.formGroup.get('name').value,
+          description: this.formGroup.get('description').value,
+          location: this.formGroup.get('place').value,
           type: '',
         });
         return v;
       });
+
     } else {
       const elemIndex = this.data().findIndex(
-        (v) => v.id === this.selectedElems.id
+        (v) => v.id === this.selectedElem().id
       );
 
       this.data()[elemIndex] = {
-        id: this.selectedElems.id,
-        title: this.group1.get('name').value,
-        description: this.group1.get('description').value,
-        location: this.group1.get('place').value,
-        type: this.selectedElems.type,
+        id: this.selectedElem().id,
+        title: this.formGroup.get('name').value,
+        description: this.formGroup.get('description').value,
+        location: this.formGroup.get('place').value,
+        type: this.selectedElem().type,
       };
     }
+
+    this.formGroup.reset()
     this.visible.set(false);
   }
 }
